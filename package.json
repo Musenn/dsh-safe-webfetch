@@ -1,0 +1,56 @@
+{
+  "name": "dsh-safe-webfetch",
+  "version": "0.1.0",
+  "description": "Local-only, SSRF-resistant HTTP fetch and Readability extraction for DeepSeek Harness.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "npm run check",
+    "check": "node --check lib/*.js && node --check test/*.mjs && node --test",
+    "pack:check": "npm pack --dry-run"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "ipaddr.js": "^2.2.0",
+    "linkedom": "^0.18.13",
+    "undici": "^6.28.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-web": ">=0.0.1-rc.1",
+    "@deepseek-ai/schemastery": ">=3.18.1"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "web-fetch",
+    "readability",
+    "ssrf"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Musenn/dsh-safe-webfetch.git"
+  },
+  "homepage": "https://github.com/Musenn/dsh-safe-webfetch#readme",
+  "bugs": {
+    "url": "https://github.com/Musenn/dsh-safe-webfetch/issues"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,27 @@
+- id: web
+  config:
+    fetchProvider: safe-local
+
+# Web App disables the host-plane copy because search is mounted per session.
+# Re-enable only web_fetch here; web_search remains owned by each agent preset.
+- id: tool-web
+  disabled: false
+  config:
+    search: false
+    fetch: true
+    fetchTimeoutMs: 45000
+    fetchMaxOutputChars: 200000
+
+- insert:
+    - id: safe-webfetch
+      name: dsh-safe-webfetch
+      config:
+        maxUrlLength: 2048
+        maxResponseBytes: 5000000
+        maxBodyChars: 160000
+        timeoutMs: 30000
+        maxRedirects: 5
+        maxConcurrency: 4
+        minReadableChars: 180
+        allowVpnFakeIp: false
+        userAgent: dsh-safe-webfetch/0.1.0
