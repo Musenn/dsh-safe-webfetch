@@ -1,7 +1,7 @@
 {
   "name": "dsh-safe-webfetch",
-  "version": "0.1.0",
-  "description": "Local-only, SSRF-resistant HTTP fetch and Readability extraction for DeepSeek Harness.",
+  "version": "0.2.0",
+  "description": "Local-only, SSRF-resistant web and PDF retrieval for DeepSeek Harness.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -25,15 +25,18 @@
     }
   },
   "engines": {
-    "node": ">=18.17"
+    "node": ">=22.19"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
+    "@napi-rs/canvas": "^1.0.8",
     "ipaddr.js": "^2.2.0",
     "linkedom": "^0.18.13",
+    "pdfjs-dist": "^6.2.108",
     "undici": "^6.28.0"
   },
   "peerDependencies": {
+    "@deepseek-ai/dsh-tools": ">=0.0.1-rc.1",
     "@deepseek-ai/dsh-web": ">=0.0.1-rc.1",
     "@deepseek-ai/schemastery": ">=3.18.1"
   },
@@ -42,6 +45,7 @@
     "deepseek-harness",
     "web-fetch",
     "readability",
+    "pdf",
     "ssrf"
   ],
   "repository": {
@@ -52,5 +56,8 @@
   "bugs": {
     "url": "https://github.com/Musenn/dsh-safe-webfetch/issues"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "pdf-lib": "^1.17.1"
+  }
 }

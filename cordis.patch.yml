@@ -9,7 +9,7 @@
   config:
     search: false
     fetch: true
-    fetchTimeoutMs: 45000
+    fetchTimeoutMs: 120000
     fetchMaxOutputChars: 200000
 
 - insert:
@@ -18,10 +18,20 @@
       config:
         maxUrlLength: 2048
         maxResponseBytes: 5000000
+        maxPdfBytes: 25000000
         maxBodyChars: 160000
         timeoutMs: 30000
         maxRedirects: 5
         maxConcurrency: 4
         minReadableChars: 180
+        maxPdfPages: 300
+        maxVisualPdfPages: 8
+        maxPdfConcurrency: 2
+        pdfTimeoutMs: 90000
+        pdfToolTimeoutMs: 120000
+        workerMemoryMb: 256
+        renderMaxPixels: 2000000
+        renderScale: 1.5
+        jpegQuality: 85
         allowVpnFakeIp: false
-        userAgent: dsh-safe-webfetch/0.1.0
+        userAgent: dsh-safe-webfetch/0.2.0

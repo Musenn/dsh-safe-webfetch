@@ -1,15 +1,26 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { SafeLocalFetchProvider } from "../lib/provider.js";
+import { textPdf } from "./pdf-fixture.mjs";
 
 const config = {
   maxUrlLength: 2048,
   maxResponseBytes: 1024,
+  maxPdfBytes: 100_000,
   maxBodyChars: 800,
   timeoutMs: 1000,
   maxRedirects: 2,
   maxConcurrency: 2,
   minReadableChars: 50,
+  maxPdfPages: 20,
+  maxVisualPdfPages: 4,
+  maxPdfConcurrency: 2,
+  pdfTimeoutMs: 15_000,
+  pdfToolTimeoutMs: 20_000,
+  workerMemoryMb: 128,
+  renderMaxPixels: 1_000_000,
+  renderScale: 1.5,
+  jpegQuality: 85,
   allowVpnFakeIp: false,
   userAgent: "dsh-safe-webfetch-test",
 };
@@ -75,4 +86,40 @@ test("an already-aborted caller never reaches DNS or transport", async () => {
     fetch: async () => assert.fail("unexpected request"),
   });
   await assert.rejects(provider.fetch({ url: "https://example.com" }, controller.signal), { code: "WEB_ABORTED" });
+});
+
+test("PDF responses are extracted locally into the native text body", async () => {
+  const records = { closed: 0 };
+  const pdf = await textPdf(["Provider PDF content"]);
+  const provider = new SafeLocalFetchProvider(config, {
+    lookup: async () => [{ address: "93.184.216.34", family: 4 }],
+    createAgent: fakeAgentFactory(records),
+    fetch: async () => new Response(pdf, { status: 200, headers: { "content-type": "application/pdf" } }),
+  });
+  const result = await provider.fetch({ url: "https://example.com/report.pdf" });
+  assert.equal(result.body.kind, "text");
+  assert.match(result.body.content, /Provider PDF content/);
+  assert.match(result.body.content, /\[Page 1\]/);
+});
+
+test("PDF signature is detected under generic binary MIME", async () => {
+  const records = { closed: 0 };
+  const pdf = await textPdf(["Generic MIME PDF"]);
+  const provider = new SafeLocalFetchProvider(config, {
+    lookup: async () => [{ address: "93.184.216.34", family: 4 }],
+    createAgent: fakeAgentFactory(records),
+    fetch: async () => new Response(pdf, { status: 200, headers: { "content-type": "application/octet-stream" } }),
+  });
+  const result = await provider.fetch({ url: "https://example.com/download" });
+  assert.match(result.body.content, /Generic MIME PDF/);
+});
+
+test("a PDF MIME response with non-PDF bytes is rejected", async () => {
+  const records = { closed: 0 };
+  const provider = new SafeLocalFetchProvider(config, {
+    lookup: async () => [{ address: "93.184.216.34", family: 4 }],
+    createAgent: fakeAgentFactory(records),
+    fetch: async () => new Response("not a pdf", { status: 200, headers: { "content-type": "application/pdf" } }),
+  });
+  await assert.rejects(provider.fetch({ url: "https://example.com/bad.pdf" }), { code: "WEB_PDF_INVALID" });
 });
